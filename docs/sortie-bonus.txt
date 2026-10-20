@@ -1,0 +1,287 @@
+
+==============================================================
+ C3 — cacher un numéro de téléphone (pgcrypto)
+==============================================================
+
+--- 1. Avant : le téléphone est en clair dans la table ---
+ customer_id |    phone     
+-------------+--------------
+           1 | +33652901149
+           2 | +33616754245
+           3 | +33623541311
+(3 rows)
+
+
+--- 2. Chiffrement, puis effacement de la version en clair ---
+
+--- 3. Ce que voit quelqu'un qui lit la table (illisible) ---
+ customer_id | en_clair |                      stocke                       
+-------------+----------+---------------------------------------------------
+           1 |          | c30d040703020ef3b3e4d3084eed64d23d017bef4e13c41e…
+           2 |          | c30d04070302b4b70882929af84b61d23d01401f66393fb8…
+           3 |          | c30d0407030293cc7edaed2210347fd23d01bc0109676f13…
+(3 rows)
+
+
+--- 4. Avec la bonne clé : lisible ---
+ customer_id |  dechiffre   
+-------------+--------------
+           1 | +33652901149
+           2 | +33616754245
+           3 | +33623541311
+(3 rows)
+
+
+--- 5. Avec une mauvaise clé : refusé ---
+psql:bonus/cyber/C3_pgcrypto.sql:55: NOTICE:  Refusé, comme attendu : Wrong key or corrupt data
+
+>>> C3 terminé. Le même texte chiffré deux fois donne deux résultats
+    différents (sel aléatoire) : on ne peut pas deviner les doublons.
+ deux_chiffrements_differents 
+------------------------------
+ t
+(1 row)
+
+
+==============================================================
+ C4 — injection SQL, puis correction
+==============================================================
+
+=== 1. Usage normal : on cherche un nom précis ===
+ lignes_rendues 
+----------------
+              1
+(1 row)
+
+
+=== 2. L'ATTAQUE sur la version vulnérable ===
+    Saisie piégée :  Nom1' OR '1'='1
+    La requête devient : ... WHERE last_name = 'Nom1' OR '1'='1'
+    -> la condition est toujours vraie, tout le fichier client sort.
+ lignes_rendues 
+----------------
+            501
+(1 row)
+
+
+    Les 3 premières lignes volées :
+ customer_id | last_name |         email         
+-------------+-----------+-----------------------
+           1 | Nom1      | client1@novabank.test
+           2 | Nom2      | client2@novabank.test
+           3 | Nom3      | client3@novabank.test
+(3 rows)
+
+
+=== 3. La MÊME attaque sur la version corrigée ===
+    La saisie est traitée comme un simple texte : aucun client ne
+    s'appelle littéralement "Nom1' OR '1'='1", donc 0 ligne.
+ lignes_rendues 
+----------------
+              0
+(1 row)
+
+
+    Et l'usage normal fonctionne toujours :
+ lignes_rendues 
+----------------
+              1
+(1 row)
+
+
+>>> C4 terminé.
+    À retenir : échapper les quotes à la main ne suffit pas. La seule
+    méthode sûre est de ne jamais mettre la valeur dans le texte de
+    la requête — USING la transmet à part.
+
+==============================================================
+ D1 — cinq analyses (rank, lag, ntile)
+==============================================================
+
+=== 1. Qui a le plus d'argent, par tranche d'âge ? ===
+    tranche     | customer_id | age |   avoirs   | rang 
+----------------+-------------+-----+------------+------
+ 18-29 ans      |         294 |  28 | 2153202.01 |    1
+ 18-29 ans      |         296 |  25 | 2147281.49 |    2
+ 18-29 ans      |          69 |  24 | 2138320.86 |    3
+ 30-44 ans      |         365 |  43 | 2145723.12 |    1
+ 30-44 ans      |         277 |  38 | 2142449.88 |    2
+ 30-44 ans      |         436 |  33 | 2141126.14 |    3
+ 45-59 ans      |         450 |  54 | 2148010.35 |    1
+ 45-59 ans      |         458 |  55 | 2147646.22 |    2
+ 45-59 ans      |         369 |  53 | 2146365.78 |    3
+ 60 ans et plus |         129 |  64 | 2139025.22 |    1
+ 60 ans et plus |         355 |  64 | 2136647.21 |    2
+ 60 ans et plus |         225 |  64 | 2130355.22 |    3
+(12 rows)
+
+
+=== 2. Les dépôts montent-ils ? (comparaison avec la veille) ===
+    jour    |   depots    |   veille    |  variation  | tendance 
+------------+-------------+-------------+-------------+----------
+ 2026-10-20 |  5595111.31 | 10326297.93 | -4731186.62 | baisse
+ 2026-10-19 | 10326297.93 | 10235259.76 |    91038.17 | hausse
+ 2026-10-18 | 10235259.76 | 10311745.29 |   -76485.53 | baisse
+ 2026-10-17 | 10311745.29 | 10311946.62 |     -201.33 | baisse
+ 2026-10-16 | 10311946.62 | 10345177.74 |   -33231.12 | baisse
+ 2026-10-15 | 10345177.74 | 10082006.71 |   263171.03 | hausse
+ 2026-10-14 | 10082006.71 | 10343926.05 |  -261919.34 | baisse
+ 2026-10-13 | 10343926.05 | 10481418.85 |  -137492.80 | baisse
+ 2026-10-12 | 10481418.85 | 10374624.89 |   106793.96 | hausse
+ 2026-10-11 | 10374624.89 | 10333095.67 |    41529.22 | hausse
+(10 rows)
+
+
+=== 3. Répartition des comptes en 10 tranches de richesse (ntile) ===
+ decile | nb_comptes | solde_min  | solde_max  | avoirs_du_decile 
+--------+------------+------------+------------+------------------
+      1 |        101 |    1755.00 | 1026351.68 |     100778037.03
+      2 |        101 | 1026357.74 | 1033040.96 |     104028159.07
+      3 |        100 | 1033099.62 | 1038363.09 |     103604508.16
+      4 |        100 | 1038421.20 | 1042308.95 |     104046423.45
+      5 |        100 | 1042319.41 | 1046236.06 |     104440354.03
+      6 |        100 | 1046240.89 | 1050120.08 |     104806631.43
+      7 |        100 | 1050157.90 | 1054507.55 |     105260183.16
+      8 |        100 | 1054539.00 | 1059468.13 |     105692224.79
+      9 |        100 | 1059531.37 | 1065888.15 |     106234804.64
+     10 |        100 | 1065904.97 | 1092094.17 |     107337141.14
+(10 rows)
+
+
+=== 4. Top 5 des comptes qui retirent le plus ===
+ rang | account_id | nb_retraits | total_retire | retrait_moyen 
+------+------------+-------------+--------------+---------------
+    1 |        375 |         493 |    237391.59 |        481.52
+    2 |        263 |         480 |    230376.92 |        479.95
+    3 |        960 |         495 |    229394.68 |        463.42
+    4 |        963 |         487 |    228499.48 |        469.20
+    5 |        328 |         488 |    227938.19 |        467.09
+(5 rows)
+
+
+=== 5. Un relevé avec le solde cumulé recalculé (somme glissante) ===
+ tx_id |    jour    |  tx_type   | amount | solde_stocke | solde_recalcule 
+-------+------------+------------+--------+--------------+-----------------
+   104 | 2026-09-26 | deposit    | 545.31 |   1000545.31 |      1000545.31
+  1823 | 2026-09-26 | deposit    | 230.44 |   1000775.75 |      1000775.75
+  2012 | 2026-09-26 | withdrawal | 423.73 |   1000352.02 |      1000352.02
+  3435 | 2026-09-26 | withdrawal | 437.26 |    999914.76 |       999914.76
+  4602 | 2026-09-26 | deposit    | 394.04 |   1000308.80 |      1000308.80
+  5838 | 2026-09-26 | withdrawal |  55.48 |   1000253.32 |      1000253.32
+  6734 | 2026-09-26 | withdrawal | 120.53 |   1000132.79 |      1000132.79
+  7096 | 2026-09-26 | deposit    | 468.66 |   1000601.45 |      1000601.45
+(8 rows)
+
+
+>>> D1 terminé.
+
+==============================================================
+ D2 — retraits anormaux (score z)
+==============================================================
+
+--- Combien de retraits anormaux sur le million d'écritures ? ---
+ retraits_total | anormaux | pourcentage 
+----------------+----------+-------------
+         451705 |     4000 |      0.8855
+(1 row)
+
+
+--- Les 10 plus atypiques ---
+ tx_id  | account_id |  amount  | moyenne | ecart_type | score_z 
+--------+------------+----------+---------+------------+---------
+ 749133 |        457 | 14355.83 |  433.01 |     805.25 |  17.290
+ 499318 |        630 | 14365.60 |  435.61 |     811.67 |  17.162
+ 999447 |          8 | 14687.36 |  423.28 |     843.02 |  16.920
+ 249198 |         15 | 14912.48 |  444.07 |     855.91 |  16.904
+ 999007 |        622 | 14920.03 |  440.43 |     857.16 |  16.893
+ 249252 |        948 | 14871.88 |  429.00 |     861.34 |  16.768
+ 999201 |        427 | 14419.72 |  435.59 |     839.99 |  16.648
+ 999801 |        966 | 13914.28 |  429.76 |     816.86 |  16.508
+ 999516 |        725 | 14595.39 |  419.47 |     859.27 |  16.498
+ 749810 |        770 | 14331.57 |  439.79 |     842.99 |  16.479
+(10 rows)
+
+
+--- Les comptes qui en concentrent le plus ---
+ account_id | nb_anomalies | pire_score 
+------------+--------------+------------
+        457 |            4 |      17.29
+        630 |            4 |      17.16
+          8 |            4 |      16.92
+         15 |            4 |      16.90
+        622 |            4 |      16.89
+(5 rows)
+
+
+>>> D2 terminé.
+
+==============================================================
+ D3 — rapport automatique en CSV
+==============================================================
+Rapports NovaBank — 20/10/2026 13:34
+
+COPY 1002
+  soldes-par-compte-20261020.csv   1002 lignes
+COPY 4000
+  retraits-anormaux-20261020.csv   4000 lignes
+COPY 4002
+  alertes-fraude-20261020.csv    4002 lignes
+COPY 2000
+  activite-mensuelle-20261020.csv   2000 lignes
+COPY 1002
+  comptes-pour-analyse-20261020.csv   1002 lignes
+
+Écrits dans /home/matteo/novabank-core/out/rapports
+  117K  activite-mensuelle-20261020.csv
+  290K  alertes-fraude-20261020.csv
+  1.9K  comptes-atypiques.csv
+  74K  comptes-pour-analyse-20261020.csv
+  275K  retraits-anormaux-20261020.csv
+  44K  soldes-par-compte-20261020.csv
+
+Aperçu de soldes-par-compte :
+account_id,account_type,status,balance,customer_id,kyc_status,risk_level
+69,courant,active,1092094.17,69,verified,4
+129,courant,active,1091672.81,129,verified,1
+958,epargne,active,1091435.87,458,verified,3
+
+==============================================================
+ D4 — comptes atypiques (Isolation Forest)
+==============================================================
+Lu : comptes-pour-analyse-20261020.csv — 1002 comptes
+
+Comptes jugés atypiques : 21 sur 1002 (2.1 %)
+
+Les 10 plus différents des autres :
+ account_id   score    balance  nb_retraits  retrait_moyen  retrait_max
+       1001 -0.8079   13995.00            1        5000.00      5000.00
+       1002 -0.7935    1755.00            0           0.00         0.00
+        129 -0.6620 1091672.81          431         408.04      8027.09
+        103 -0.6571 1032837.16          481         409.60      7215.46
+        375 -0.6553  989206.84          493         481.52     14879.52
+         69 -0.6482 1092094.17          404         471.30     12543.65
+         21 -0.6415 1011900.39          498         428.87      9962.40
+        619 -0.6321 1033509.45          478         420.30      7838.22
+        936 -0.6254 1087580.49          406         461.22     12192.73
+        916 -0.6208  995917.37          497         456.71     14951.14
+
+Pour comparaison, un compte parfaitement banal :
+ account_id  score    balance  nb_retraits  retrait_moyen  retrait_max
+        819  -0.39 1045275.07          448         457.79     13101.13
+
+Écrit : /home/matteo/novabank-core/out/rapports/comptes-atypiques.csv
+
+Recoupement avec le score z (D2) :
+  comptes signalés par le score z        : 1000
+  comptes signalés par Isolation Forest  : 21
+  signalés par les deux méthodes         : 19
+
+  Les deux méthodes ne voient pas la même chose, et c'est normal :
+  le score z repère un MONTANT hors norme, Isolation Forest repère
+  un COMPORTEMENT de compte hors norme. Un compte peut n'avoir que
+  des montants ordinaires tout en se comportant bizarrement.
+
+==============================================================
+ Bonus terminés.
+ TLS et détection d'attaque : sudo ./run_bonus.sh --serveur
+==============================================================

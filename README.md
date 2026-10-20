@@ -156,6 +156,43 @@ La première requête est celle du sujet (« l'historique met plus de
 
 ---
 
+## Les bonus — les deux parcours
+
+```bash
+./run_bonus.sh                  # tout ce qui touche la base
+sudo ./run_bonus.sh --serveur   # TLS et détection d'attaque
+```
+
+**À lancer APRÈS `run_all.sh`**, jamais avant : `run_all.sh` reconstruit la
+base de zéro et effacerait la colonne chiffrée, la table d'anomalies et les
+fonctions de démonstration.
+
+### Parcours Cyber
+
+| # | Défi | Fichier | Résultat obtenu |
+|---|---|---|---|
+| C1 | Chiffrer les connexions | `bonus/cyber/C1_tls.sh` | **TLSv1.3**, `TLS_AES_256_GCM_SHA384`. `hostssl` dans pg_hba : une connexion TCP en clair n'a plus aucune ligne qui l'autorise, elle est refusée. |
+| C2 | Repérer une attaque | `bonus/cyber/C2_detect_failed_logins.sh` | 5 échecs provoqués, puis retrouvés dans le journal avec l'heure, l'utilisateur visé et l'adresse source. |
+| C3 | Cacher une donnée | `bonus/cyber/C3_pgcrypto.sql` | 501 téléphones chiffrés avec `pgp_sym_encrypt`, **0 en clair**. Illisibles sans la clé, qui n'est pas dans le dépôt. |
+| C4 | Attaquer sa base | `bonus/cyber/C4_injection_sql.sql` | La fonction vulnérable laisse fuir **501 lignes** avec `' OR '1'='1`. La version corrigée (`format()` + `USING`) en renvoie **0**. |
+
+### Parcours IA / Data
+
+| # | Défi | Fichier | Résultat obtenu |
+|---|---|---|---|
+| D1 | Analyser | `bonus/data/D1_analyses.sql` | 5 requêtes : podium des avoirs par tranche d'âge (`rank`), tendance des dépôts jour après jour (`lag`), déciles de richesse (`ntile`), top des retraits, solde recalculé en somme glissante. |
+| D2 | Retraits bizarres | `bonus/data/D2_zscore.sql` | Score z par rapport à la moyenne **de chaque compte**. 4 000 retraits au-delà de 3 écarts-types, rangés dans `core.anomalies_retraits`. Score maximum : 17,3. |
+| D3 | Rapport automatique | `bonus/data/D3_rapport_csv.sh` | 5 fichiers CSV ouvrables dans Excel, produits par `\copy`. |
+| D4 | Comptes bizarres | `bonus/data/D4_isolation_forest.py` | Isolation Forest sur 7 caractéristiques par compte. 21 comptes atypiques sur 1 002 — dont, sans qu'on le lui dise, les deux comptes de test à l'historique minuscule. |
+
+**Pourquoi D2 et D4 ne donnent pas la même chose** : le score z regarde un
+*montant* isolé, Isolation Forest regarde le *comportement* d'un compte dans
+son ensemble (solde, nombre d'opérations, retrait moyen, retrait maximum…).
+Un compte peut n'avoir que des montants ordinaires et se comporter
+bizarrement — et inversement.
+
+---
+
 ## Déclaration d'usage de l'IA
 
 Conformément aux règles du sujet : **ce projet a été réalisé avec l'aide de
@@ -176,5 +213,12 @@ travail, pas d'un vernis.
   génération ne puisse jamais produire un solde négatif ; ce n'est pas un
   montant réaliste.
 - Pas de réplication ni de sauvegarde continue (PITR) : hors périmètre du sujet.
+- Le score z (D2) signale presque tous les comptes, parce que la génération
+  pose délibérément 4 gros retraits sur **chaque** compte. Sur des données
+  réelles, ces anomalies seraient concentrées sur quelques comptes. Le
+  recoupement avec Isolation Forest est donc à lire avec cette réserve.
+- Le certificat TLS est auto-signé : il chiffre le transport mais ne prouve
+  pas l'identité du serveur. En production il faudrait une autorité de
+  certification et `sslmode=verify-full` côté client.
 - Le **guide (document 2)** du sujet ne m'a pas été transmis ; les choix
   techniques sont les miens et peuvent différer de ceux qu'il préconise.

@@ -2,48 +2,48 @@
 ============================================================
                                              QUERY PLAN                                              
 -----------------------------------------------------------------------------------------------------
- Limit (actual time=14.549..16.043 rows=50.00 loops=1)
-   Buffers: shared hit=9866
-   ->  Gather Merge (actual time=14.548..16.039 rows=50.00 loops=1)
+ Limit (actual time=13.450..15.103 rows=50.00 loops=1)
+   Buffers: shared hit=9868
+   ->  Gather Merge (actual time=13.449..15.084 rows=50.00 loops=1)
          Workers Planned: 2
          Workers Launched: 2
-         Buffers: shared hit=9866
-         ->  Sort (actual time=13.626..13.628 rows=39.00 loops=3)
+         Buffers: shared hit=9868
+         ->  Sort (actual time=12.663..12.665 rows=38.67 loops=3)
                Sort Key: created_at DESC
                Sort Method: top-N heapsort  Memory: 32kB
-               Buffers: shared hit=9866
+               Buffers: shared hit=9868
                Worker 0:  Sort Method: top-N heapsort  Memory: 32kB
                Worker 1:  Sort Method: top-N heapsort  Memory: 32kB
-               ->  Parallel Seq Scan on transactions (actual time=0.060..13.554 rows=333.33 loops=3)
+               ->  Parallel Seq Scan on transactions (actual time=0.026..12.598 rows=333.33 loops=3)
                      Filter: (account_id = 42)
                      Rows Removed by Filter: 333000
-                     Buffers: shared hit=9790
+                     Buffers: shared hit=9792
  Planning:
    Buffers: shared hit=97
- Planning Time: 0.107 ms
- Execution Time: 16.058 ms
+ Planning Time: 0.133 ms
+ Execution Time: 15.119 ms
 (20 rows)
 
 
 --- AVANT INDEX — total des retraits des 2 derniers jours ---
                                                   QUERY PLAN                                                   
 ---------------------------------------------------------------------------------------------------------------
- Finalize Aggregate (actual time=24.278..25.814 rows=1.00 loops=1)
-   Buffers: shared hit=9790
-   ->  Gather (actual time=24.219..25.809 rows=3.00 loops=1)
+ Finalize Aggregate (actual time=23.726..25.389 rows=1.00 loops=1)
+   Buffers: shared hit=9792
+   ->  Gather (actual time=23.666..25.384 rows=3.00 loops=1)
          Workers Planned: 2
          Workers Launched: 2
-         Buffers: shared hit=9790
-         ->  Partial Aggregate (actual time=23.440..23.440 rows=1.00 loops=3)
-               Buffers: shared hit=9790
-               ->  Parallel Seq Scan on transactions (actual time=20.158..22.636 rows=12528.67 loops=3)
+         Buffers: shared hit=9792
+         ->  Partial Aggregate (actual time=22.905..22.905 rows=1.00 loops=3)
+               Buffers: shared hit=9792
+               ->  Parallel Seq Scan on transactions (actual time=19.837..21.968 rows=12718.00 loops=3)
                      Filter: ((tx_type = 'withdrawal'::text) AND (created_at >= (now() - '2 days'::interval)))
-                     Rows Removed by Filter: 320805
-                     Buffers: shared hit=9790
+                     Rows Removed by Filter: 320615
+                     Buffers: shared hit=9792
  Planning:
    Buffers: shared hit=43
- Planning Time: 0.077 ms
- Execution Time: 25.830 ms
+ Planning Time: 0.064 ms
+ Execution Time: 25.405 ms
 (16 rows)
 
 
@@ -52,48 +52,40 @@
 ============================================================
                                                  QUERY PLAN                                                  
 -------------------------------------------------------------------------------------------------------------
- Limit (actual time=0.021..0.049 rows=50.00 loops=1)
+ Limit (actual time=0.018..0.044 rows=50.00 loops=1)
    Buffers: shared hit=53 read=3
-   ->  Index Scan using idx_tx_account_created on transactions (actual time=0.020..0.046 rows=50.00 loops=1)
+   ->  Index Scan using idx_tx_account_created on transactions (actual time=0.018..0.041 rows=50.00 loops=1)
          Index Cond: (account_id = 42)
          Index Searches: 1
          Buffers: shared hit=53 read=3
  Planning:
-   Buffers: shared hit=30 read=1
- Planning Time: 0.087 ms
- Execution Time: 0.056 ms
+   Buffers: shared hit=32 read=1
+ Planning Time: 0.070 ms
+ Execution Time: 0.051 ms
 (10 rows)
 
 
 --- APRÈS INDEX — total des retraits des 2 derniers jours ---
-                                                    QUERY PLAN                                                    
-------------------------------------------------------------------------------------------------------------------
- Finalize Aggregate (actual time=5.437..6.525 rows=1.00 loops=1)
-   Buffers: shared hit=876
-   ->  Gather (actual time=5.390..6.521 rows=3.00 loops=1)
-         Workers Planned: 2
-         Workers Launched: 2
-         Buffers: shared hit=876
-         ->  Partial Aggregate (actual time=4.196..4.196 rows=1.00 loops=3)
-               Buffers: shared hit=876
-               ->  Parallel Bitmap Heap Scan on transactions (actual time=0.106..3.434 rows=12528.67 loops=3)
-                     Recheck Cond: (created_at >= (now() - '2 days'::interval))
-                     Rows Removed by Index Recheck: 503
-                     Filter: (tx_type = 'withdrawal'::text)
-                     Rows Removed by Filter: 15194
-                     Heap Blocks: lossy=343
-                     Buffers: shared hit=876
-                     Worker 0:  Heap Blocks: lossy=251
-                     Worker 1:  Heap Blocks: lossy=236
-                     ->  Bitmap Index Scan on idx_tx_created_brin (actual time=0.115..0.115 rows=8300.00 loops=1)
-                           Index Cond: (created_at >= (now() - '2 days'::interval))
-                           Index Searches: 1
-                           Buffers: shared hit=6
+                                              QUERY PLAN                                              
+------------------------------------------------------------------------------------------------------
+ Aggregate (actual time=11.321..11.322 rows=1.00 loops=1)
+   Buffers: shared hit=838
+   ->  Bitmap Heap Scan on transactions (actual time=0.175..8.681 rows=38154.00 loops=1)
+         Recheck Cond: (created_at >= (now() - '2 days'::interval))
+         Rows Removed by Index Recheck: 1687
+         Filter: (tx_type = 'withdrawal'::text)
+         Rows Removed by Filter: 45007
+         Heap Blocks: lossy=832
+         Buffers: shared hit=838
+         ->  Bitmap Index Scan on idx_tx_created_brin (actual time=0.025..0.025 rows=8320.00 loops=1)
+               Index Cond: (created_at >= (now() - '2 days'::interval))
+               Index Searches: 1
+               Buffers: shared hit=6
  Planning:
    Buffers: shared hit=4
- Planning Time: 0.031 ms
- Execution Time: 6.535 ms
-(25 rows)
+ Planning Time: 0.027 ms
+ Execution Time: 11.330 ms
+(17 rows)
 
 
 --- Taille des index (le BRIN est minuscule, c'est voulu) ---
@@ -101,6 +93,8 @@
 ----------------------------+------------
  idx_tx_account_created     | 30 MB
  transactions_pkey          | 21 MB
+ idx_fraud_open             | 144 kB
+ fraud_alerts_pkey          | 104 kB
  accounts_iban_unique       | 104 kB
  mv_account_monthly_pk      | 80 kB
  accounts_pkey              | 64 kB
@@ -108,10 +102,8 @@
  idx_accounts_customer      | 40 kB
  idx_tx_created_brin        | 32 kB
  customers_pkey             | 32 kB
- idx_fraud_open             | 8192 bytes
- transfers_pkey             | 8192 bytes
- fraud_alerts_pkey          | 8192 bytes
  idx_transfers_from_created | 8192 bytes
+ transfers_pkey             | 8192 bytes
 (13 rows)
 
 >>> Étape 5 terminée.

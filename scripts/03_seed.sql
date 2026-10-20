@@ -42,8 +42,10 @@ CROSS JOIN generate_series(1, 2) AS k;
 -- 1 000 000 d'écritures : 1 000 par compte.
 --
 -- Pourquoi on ne descend jamais sous zéro :
---   solde de départ          = 1 000 000,00
---   pire cas = 1 000 retraits plafonnés à 500,00 = 500 000,00
+--   solde de départ = 1 000 000,00
+--   pire cas = 996 retraits plafonnés à 500,00      =  498 000,00
+--            +   4 gros retraits plafonnés à 15 000 =   60 000,00
+--                                              soit  558 000,00
 --   -> le solde reste positif quoi qu'il arrive, la contrainte tient.
 --
 -- balance_after est calculé par une somme glissante (SUM OVER) : chaque
@@ -55,6 +57,14 @@ WITH brut AS (
         g.n,
         (random() < 0.55)                               AS est_depot,
         round((random() * 890 + 10)::numeric, 2)        AS montant_brut,
+        -- Exactement 4 gros retraits par compte (n = 250, 500, 750, 1000).
+        -- Deterministe et donc BORNE : 4 x 15 000 = 60 000 au pire, ce qui
+        -- laisse le solde largement positif. Un tirage aleatoire ne donnerait
+        -- aucune garantie. Ces montants hors normes servent aux bonus D2
+        -- (score z) et D4 (Isolation Forest) : sans eux, des retraits tires
+        -- uniformement entre 10 et 500 EUR ne contiennent aucune anomalie.
+        (g.n % 250 = 0)                                 AS est_gros_retrait,
+        round((random() * 10000 + 5000)::numeric, 2)    AS montant_gros,
         now() - ((1000 - g.n) * INTERVAL '35 minutes')
               + (((random() * 1800)::int) * INTERVAL '1 second')  AS created_at
     FROM core.accounts a
@@ -63,8 +73,11 @@ WITH brut AS (
 typee AS (
     SELECT
         account_id, n, created_at,
-        CASE WHEN est_depot THEN 'deposit' ELSE 'withdrawal' END AS tx_type,
-        CASE WHEN est_depot THEN montant_brut
+        CASE WHEN est_gros_retrait THEN 'withdrawal'
+             WHEN est_depot         THEN 'deposit'
+             ELSE 'withdrawal' END                               AS tx_type,
+        CASE WHEN est_gros_retrait THEN montant_gros
+             WHEN est_depot         THEN montant_brut
              ELSE least(montant_brut, 500.00) END                AS amount
     FROM brut
 ),
@@ -118,3 +131,17 @@ FROM core.accounts a
 JOIN (SELECT DISTINCT ON (account_id) account_id, balance_after AS dernier_solde
       FROM core.transactions ORDER BY account_id, tx_id DESC) d USING (account_id)
 WHERE a.balance <> d.dernier_solde;
+
+-- ---------------------------------------------------------------------
+-- Rattrapage des alertes sur l'historique.
+-- Les triggers de l'étape 6 n'existent pas encore au moment du chargement :
+-- les gros retraits du passé ne déclencheraient donc aucune alerte. On les
+-- rattrape ici, avec la même règle que le trigger (retrait >= 5 000).
+-- ---------------------------------------------------------------------
+INSERT INTO core.fraud_alerts (account_id, tx_id, rule_code, status, created_at)
+SELECT account_id, tx_id, 'BIG_WITHDRAWAL', 'open', created_at
+FROM core.transactions
+WHERE tx_type = 'withdrawal' AND amount >= 5000;
+
+\echo '>>> Alertes rattrapées sur l''historique :'
+SELECT rule_code, count(*) FROM core.fraud_alerts GROUP BY rule_code;

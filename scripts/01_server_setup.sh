@@ -21,7 +21,7 @@ sudo sed -i "s/^#\?listen_addresses.*/listen_addresses = 'localhost'/" "$PG_CONF
 # Journalisation utile pour l'audit et le bonus C2.
 sudo sed -i "s/^#\?log_connections.*/log_connections = 'all'/"        "$PG_CONF"
 sudo sed -i "s/^#\?log_disconnections.*/log_disconnections = on/"     "$PG_CONF"
-sudo sed -i "s/^#\?log_line_prefix.*/log_line_prefix = '%m [%p] %q%u@%d '/" "$PG_CONF"
+sudo sed -i "s/^#\?log_line_prefix.*/log_line_prefix = '%m [%p] %q%u@%d %h '/" "$PG_CONF"
 
 echo "[3/5] Authentification : mot de passe chiffré obligatoire"
 # En local (socket Unix) : peer, c'est le systeme qui prouve l'identite -> aucun mot de passe a stocker.

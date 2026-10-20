@@ -43,19 +43,3 @@
 
 
 --- Alertes de fraude levées pendant les tests ---
- alert_id | account_id |    rule_code    | status |          created_at           
-----------+------------+-----------------+--------+-------------------------------
-        1 |       1001 | BIG_WITHDRAWAL  | open   | 2026-10-20 12:53:25.755467+02
-        2 |       1001 | RAPID_TRANSFERS | open   | 2026-10-20 12:53:25.755467+02
-(2 rows)
-
-
---- Dernières lignes du journal d'audit ---
- log_id |   table_name   | operation | db_user |          changed_at           
---------+----------------+-----------+---------+-------------------------------
-     22 | core.customers | UPDATE    | matteo  | 2026-10-20 12:53:25.755467+02
-     21 | core.accounts  | UPDATE    | matteo  | 2026-10-20 12:53:25.755467+02
-     20 | core.accounts  | UPDATE    | matteo  | 2026-10-20 12:53:25.755467+02
-     19 | core.accounts  | UPDATE    | matteo  | 2026-10-20 12:53:25.755467+02
-     18 | core.accounts  | UPDATE    | matteo  | 2026-10-20 12:53:25.755467+02
-(5 rows)
