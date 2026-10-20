@@ -1,0 +1,9 @@
+# Sauvegardes et sorties : volumineuses, régénérables
+out/
+*.dump
+*.sql.gz
+
+# Jamais de secret dans Git
+*.env
+.pgpass
+secrets/

@@ -1,0 +1,61 @@
+================= RÉSULTATS DES TESTS =================
+ n  |   famille   |                         intitule                         | verdict |                                     detail                                      
+----+-------------+----------------------------------------------------------+---------+---------------------------------------------------------------------------------
+  1 | Tables      | Email sans arobase refusé                                | OK      | refusé : new row for relation "customers" violates check constraint "customers_
+  2 | Tables      | Email en double refusé                                   | OK      | refusé : duplicate key value violates unique constraint "customers_email_unique
+  3 | Tables      | Client mineur refusé                                     | OK      | refusé : new row for relation "customers" violates check constraint "customers_
+  4 | Tables      | IBAN en double refusé                                    | OK      | refusé : duplicate key value violates unique constraint "accounts_iban_unique"
+  5 | Tables      | Virement de montant négatif refusé                       | OK      | refusé : new row for relation "transfers" violates check constraint "transfers_
+  6 | Tables      | Virement vers le même compte refusé                      | OK      | refusé : new row for relation "transfers" violates check constraint "transfers_
+  7 | Grand livre | UPDATE d'une écriture refusé                             | OK      | refusé : core.transactions est en écriture seule : UPDATE interdit (tx_id 10000
+  8 | Grand livre | DELETE d'une écriture refusé                             | OK      | refusé : core.transactions est en écriture seule : DELETE interdit (tx_id 10000
+  9 | Grand livre | TRUNCATE du grand livre refusé                           | OK      | refusé : cannot truncate a table referenced in a foreign key constraint
+ 10 | Solde       | Retrait supérieur au solde refusé                        | OK      | refusé : Solde insuffisant sur le compte 1002 : solde 500.00, opération withdra
+ 11 | Solde       | Un dépôt met le solde à jour tout seul                   | OK      | accepté
+ 12 | Solde       | Le solde a augmenté d'exactement 250,00                  | OK      | avant 500.00, après 750.00
+ 13 | Virement    | Virement valide accepté                                  | OK      | accepté
+ 14 | Virement    | Le virement a produit exactement 2 écritures             | OK      | 2 écritures ajoutées
+ 15 | Virement    | L'argent n'est ni créé ni détruit                        | OK      | avant 20750.00, après 20750.00
+ 16 | Virement    | Virement sans provision refusé                           | OK      | refusé : Solde insuffisant sur le compte 1002 : solde 1750.00, opération transf
+ 17 | Virement    | Le virement refusé n'a laissé AUCUNE trace               | OK      | en entier, ou pas du tout
+ 18 | Fraude      | Gros retrait accepté (compte approvisionné)              | OK      | accepté
+ 19 | Fraude      | Retrait de 5 000 : alerte BIG_WITHDRAWAL créée           | OK      | 
+ 20 | Fraude      | 5 virements en 10 minutes : alerte RAPID_TRANSFERS créée | OK      | 
+ 21 | Audit       | Le changement est noté avec avant ET après               | OK      | 
+ 22 | Audit       | Le journal retient qui a fait le changement              | OK      | 
+ 23 | Audit       | Modifier le journal est refusé                           | OK      | refusé : audit.audit_log est en écriture seule : UPDATE interdit
+ 24 | Audit       | Effacer le journal est refusé                            | OK      | refusé : audit.audit_log est en écriture seule : DELETE interdit
+ 25 | Vues        | La vue masquée ne laisse pas fuir l'email complet        | OK      | 
+ 26 | Vues        | CHECK OPTION : fermer un compte via la vue est refusé    | OK      | refusé : new row violates check option for view "v_accounts_active"
+ 27 | Vues        | La vue matérialisée contient des totaux                  | OK      | 
+ 28 | Droits      | Analyste : lire les emails est REFUSÉ                    | OK      | c'est la réponse au problème n°1 du sujet
+ 29 | Droits      | Analyste : lire les écritures reste autorisé             | OK      | 
+ 30 | Droits      | Support : la vue masquée est lisible                     | OK      | 
+ 31 | Droits      | Support : la table clients reste interdite               | OK      | 
+ 32 | Droits      | Appli : écrire en direct dans le grand livre est REFUSÉ  | OK      | elle doit passer par sp_transfer
+(32 rows)
+
+
+ total | reussis | echoues 
+-------+---------+---------
+    32 |      32 |       0
+(1 row)
+
+
+--- Alertes de fraude levées pendant les tests ---
+ alert_id | account_id |    rule_code    | status |          created_at           
+----------+------------+-----------------+--------+-------------------------------
+        1 |       1001 | BIG_WITHDRAWAL  | open   | 2026-10-20 12:53:25.755467+02
+        2 |       1001 | RAPID_TRANSFERS | open   | 2026-10-20 12:53:25.755467+02
+(2 rows)
+
+
+--- Dernières lignes du journal d'audit ---
+ log_id |   table_name   | operation | db_user |          changed_at           
+--------+----------------+-----------+---------+-------------------------------
+     22 | core.customers | UPDATE    | matteo  | 2026-10-20 12:53:25.755467+02
+     21 | core.accounts  | UPDATE    | matteo  | 2026-10-20 12:53:25.755467+02
+     20 | core.accounts  | UPDATE    | matteo  | 2026-10-20 12:53:25.755467+02
+     19 | core.accounts  | UPDATE    | matteo  | 2026-10-20 12:53:25.755467+02
+     18 | core.accounts  | UPDATE    | matteo  | 2026-10-20 12:53:25.755467+02
+(5 rows)
