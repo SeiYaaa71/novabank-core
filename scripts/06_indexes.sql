@@ -1,5 +1,5 @@
 -- =====================================================================
--- NovaBank Core — Étape 5 : les index, et la preuve qu'ils servent
+-- NovaBank Core - Étape 5 : les index, et la preuve qu'ils servent
 --
 -- Problème n°3 du sujet : "l'historique d'un compte met plus de
 -- 4 secondes". On mesure AVANT, on indexe, on mesure APRÈS.
@@ -15,7 +15,7 @@ DROP INDEX IF EXISTS core.idx_fraud_open;
 
 \echo ''
 \echo '============================================================'
-\echo ' AVANT INDEX — historique des 50 dernières écritures du compte 42'
+\echo ' AVANT INDEX - historique des 50 dernières écritures du compte 42'
 \echo '============================================================'
 EXPLAIN (ANALYZE, BUFFERS, COSTS OFF)
 SELECT tx_id, created_at, tx_type, amount, balance_after
@@ -29,7 +29,7 @@ LIMIT 50;
 -- ramènerait TOUTE la table, et aucun index ne battrait jamais un parcours
 -- complet dans ce cas. Sur 2 jours (~8 % des lignes), le BRIN a un intérêt.
 \echo ''
-\echo '--- AVANT INDEX — total des retraits des 2 derniers jours ---'
+\echo '--- AVANT INDEX - total des retraits des 2 derniers jours ---'
 EXPLAIN (ANALYZE, BUFFERS, COSTS OFF)
 SELECT count(*), sum(amount)
 FROM core.transactions
@@ -74,7 +74,7 @@ ANALYZE core.transfers;
 
 \echo ''
 \echo '============================================================'
-\echo ' APRÈS INDEX — exactement la même requête'
+\echo ' APRÈS INDEX - exactement la même requête'
 \echo '============================================================'
 EXPLAIN (ANALYZE, BUFFERS, COSTS OFF)
 SELECT tx_id, created_at, tx_type, amount, balance_after
@@ -84,7 +84,7 @@ ORDER BY created_at DESC
 LIMIT 50;
 
 \echo ''
-\echo '--- APRÈS INDEX — total des retraits des 2 derniers jours ---'
+\echo '--- APRÈS INDEX - total des retraits des 2 derniers jours ---'
 EXPLAIN (ANALYZE, BUFFERS, COSTS OFF)
 SELECT count(*), sum(amount)
 FROM core.transactions

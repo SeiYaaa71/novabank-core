@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =====================================================================
-# BONUS D3 — Rapport automatique en CSV
+# BONUS D3 - Rapport automatique en CSV
 # Produit des fichiers ouvrables dans Excel ou LibreOffice.
 #
 # On utilise \copy (commande psql côté client) et non COPY (commande SQL
@@ -22,7 +22,7 @@ csv () {   # csv <nom_du_fichier> <requête>
     printf '  %-28s %6s lignes\n' "${nom}-${JOUR}.csv" "$(( $(wc -l < "${DEST}/${nom}-${JOUR}.csv") - 1 ))"
 }
 
-echo "Rapports NovaBank — $(date '+%d/%m/%Y %H:%M')"
+echo "Rapports NovaBank - $(date '+%d/%m/%Y %H:%M')"
 echo
 
 csv "soldes-par-compte" "
@@ -63,7 +63,7 @@ csv "comptes-pour-analyse" "
 
 echo
 echo "Écrits dans ${DEST}"
-ls -lh "$DEST" | tail -n +2 | awk '{printf "  %s  %s\n", $5, $9}'
+ls -lh "$DEST" | tail -n +2 | awk '{printf " %s  %s\n", $5, $9}'
 echo
 echo "Aperçu de soldes-par-compte :"
 head -4 "${DEST}/soldes-par-compte-${JOUR}.csv"

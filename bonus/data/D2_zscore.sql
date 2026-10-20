@@ -1,5 +1,5 @@
 -- =====================================================================
--- BONUS D2 — Les retraits bizarres
+-- BONUS D2 - Les retraits bizarres
 -- Le score z dit "à combien d'écarts-types de la moyenne se trouve
 -- cette valeur". Au-delà de 3, la valeur est franchement inhabituelle.
 --

@@ -1,5 +1,5 @@
 -- =====================================================================
--- BONUS D1 — Cinq analyses
+-- BONUS D1 - Cinq analyses
 -- Fonctions de fenêtrage : rank, dense_rank, lag, ntile, sum cumulée.
 -- Une fonction de fenêtrage calcule une valeur par ligne EN REGARDANT
 -- les lignes voisines, sans regrouper ni perdre le détail.
@@ -47,7 +47,7 @@ SELECT
     round(lag(total_depots) OVER (ORDER BY jour), 2) AS veille,
     round(total_depots - lag(total_depots) OVER (ORDER BY jour), 2) AS variation,
     CASE
-        WHEN lag(total_depots) OVER (ORDER BY jour) IS NULL THEN '—'
+        WHEN lag(total_depots) OVER (ORDER BY jour) IS NULL THEN '-'
         WHEN total_depots > lag(total_depots) OVER (ORDER BY jour) THEN 'hausse'
         WHEN total_depots < lag(total_depots) OVER (ORDER BY jour) THEN 'baisse'
         ELSE 'stable'

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =====================================================================
-# NovaBank Core — Étape 8 : la sauvegarde
+# NovaBank Core - Étape 8 : la sauvegarde
 # Deux formats : .dump (compressé, pour restaurer) et .sql (lisible).
 # Les sauvegardes vont dans out/, qui n'est pas suivi par Git.
 # =====================================================================
@@ -25,10 +25,10 @@ cat "${DEST}/${DB}-${HORODATAGE}.sha256"
 
 echo "[4/4] Vérification : on relit le dump sans restaurer (pg_restore --list)"
 pg_restore --list "${DEST}/${DB}-${HORODATAGE}.dump" | head -15
-echo "  ... ($(pg_restore --list "${DEST}/${DB}-${HORODATAGE}.dump" | grep -c ';' ) entrées au total)"
+echo " ... ($(pg_restore --list "${DEST}/${DB}-${HORODATAGE}.dump" | grep -c ';' ) entrées au total)"
 
 ls -lh "$DEST"
 echo
 echo "Pour restaurer sur une base neuve :"
-echo "  createdb novabank_restore"
-echo "  pg_restore -d novabank_restore ${DEST}/${DB}-${HORODATAGE}.dump"
+echo " createdb novabank_restore"
+echo " pg_restore -d novabank_restore ${DEST}/${DB}-${HORODATAGE}.dump"

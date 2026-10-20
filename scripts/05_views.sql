@@ -1,5 +1,5 @@
 -- =====================================================================
--- NovaBank Core — Étape 4 : les vues
+-- NovaBank Core - Étape 4 : les vues
 --   1. une vue qui cache des données   -> v_customers_masked
 --   2. une vue modifiable avec limite  -> v_accounts_active (CHECK OPTION)
 --   3. une vue enregistrée             -> mv_account_monthly (MATERIALIZED)

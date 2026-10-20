@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =====================================================================
-# BONUS C2 — Repérer une attaque
+# BONUS C2 - Repérer une attaque
 # On se trompe volontairement 5 fois de mot de passe, puis on retrouve
 # les 5 échecs dans les journaux du serveur.
 #
@@ -8,7 +8,7 @@
 #   - log_connections activé (fait par scripts/01_server_setup.sh)
 #   - votre compte doit pouvoir LIRE les journaux. Sur Ubuntu ils
 #     appartiennent à postgres:adm en 640, donc :
-#         sudo usermod -aG adm "$USER"     (puis rouvrir une session)
+#         sudo usermod -aG adm "$USER"    (puis rouvrir une session)
 #     C'est préférable à un sudo dans le script : un outil de lecture de
 #     journaux n'a aucune raison de tourner en root.
 # =====================================================================
@@ -31,13 +31,13 @@ for i in 1 2 3 4 5; do
     PGPASSWORD="mauvais-mot-de-passe-$i" \
     psql "host=127.0.0.1 dbname=novabank user=${CIBLE} sslmode=prefer" \
          -c "SELECT 1" >/dev/null 2>&1 \
-      && echo "  tentative $i : acceptée (anormal !)" \
-      || echo "  tentative $i : refusée"
+      && echo " tentative $i : acceptée (anormal !)" \
+      || echo " tentative $i : refusée"
 done
 
 echo
 echo "=== 2. On retrouve ces échecs dans le journal ==="
-echo "    Fichier : ${LOG}"
+echo "   Fichier : ${LOG}"
 echo
 
 grep -a "password authentication failed" "$LOG" \
@@ -46,26 +46,26 @@ grep -a "password authentication failed" "$LOG" \
 
 NB=$(grep -ac "password authentication failed" "$LOG" || true)
 echo
-echo "    À noter : ici 5 tentatives donnent 5 lignes. Ce n'était pas le cas"
-echo "    avant d'activer TLS (bonus C1) : avec sslmode=prefer, psql essayait"
-echo "    d'abord en chiffré, se faisait refuser, puis retentait en clair —"
-echo "    soit DEUX échecs journalisés par appel. Depuis que hostssl impose"
-echo "    TLS, la poignée de main réussit et il n'y a plus qu'une tentative."
-echo "    Un seuil d'alerte calibré sur l'ancien comportement se déclencherait"
-echo "    deux fois trop tard."
+echo "   À noter : ici 5 tentatives donnent 5 lignes. Ce n'était pas le cas"
+echo "   avant d'activer TLS (bonus C1) : avec sslmode=prefer, psql essayait"
+echo "   d'abord en chiffré, se faisait refuser, puis retentait en clair -"
+echo "   soit DEUX échecs journalisés par appel. Depuis que hostssl impose"
+echo "   TLS, la poignée de main réussit et il n'y a plus qu'une tentative."
+echo "   Un seuil d'alerte calibré sur l'ancien comportement se déclencherait"
+echo "   deux fois trop tard."
 echo
-echo "    Le compteur ci-dessous est CUMULÉ sur toutes les exécutions"
-echo "    précédentes : le journal n'est pas remis à zéro entre deux essais."
+echo "   Le compteur ci-dessous est CUMULÉ sur toutes les exécutions"
+echo "   précédentes : le journal n'est pas remis à zéro entre deux essais."
 echo
 echo "=== 3. Bilan ==="
-echo "    Échecs d'authentification au total dans le journal : ${NB}"
+echo "   Échecs d'authentification au total dans le journal : ${NB}"
 
 echo
 echo "=== 4. Comptage par utilisateur visé et par adresse source ==="
 grep -a "password authentication failed" "$LOG" \
   | grep -oE 'user "[^"]+"' | sort | uniq -c | sort -rn
 echo
-echo "    Et par adresse source (le %h du log_line_prefix) :"
+echo "   Et par adresse source (le %h du log_line_prefix) :"
 grep -a "password authentication failed" "$LOG" \
   | grep -oE '[0-9]{1,3}(\.[0-9]{1,3}){3}' | sort | uniq -c | sort -rn | head -5
 

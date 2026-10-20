@@ -1,4 +1,4 @@
-# Notes de travail — ce qui a raté, et pourquoi
+# Notes de travail - ce qui a raté, et pourquoi
 
 Le README déclare que ce projet a été fait avec l'aide d'une IA. Pour que
 cette déclaration veuille dire quelque chose, voici les erreurs réellement
@@ -16,13 +16,13 @@ n'existe pas sur la plateforme ARM `armv8virtual` (Mac Apple Silicon).
 **Correction :** `VBoxManage modifyvm <vm> --usb-xhci on --keyboard usb --mouse usbtablet`.
 
 **Ce que ça apprend :** une plateforme matérielle émulée n'a pas les mêmes
-bus qu'un PC. Le réflexe « ça doit marcher par défaut » est faux sur ARM.
+bus qu'un PC. Le réflexe " ça doit marcher par défaut " est faux sur ARM.
 
 ## 2. L'utilisateur `postgres` ne pouvait pas lire les scripts
 
 **Symptôme :** `psql: error: ... Permission denied` sur un fichier du dépôt.
 
-**Cause :** `sudo -u postgres psql -f ~/novabank-core/...` — le compte
+**Cause :** `sudo -u postgres psql -f ~/novabank-core/...` - le compte
 `postgres` n'a pas accès au dossier personnel d'un autre utilisateur.
 
 **Correction :** création d'un rôle PostgreSQL au nom de l'utilisateur Unix,
@@ -43,17 +43,17 @@ dépendances. C'est expliqué dans le README.
 
 ## 4. Une requête de démonstration qui ne démontrait rien
 
-**Symptôme :** après création des index, la requête « retraits du dernier
-mois » restait en `Seq Scan`, sans aucun gain.
+**Symptôme :** après création des index, la requête " retraits du dernier
+mois " restait en `Seq Scan`, sans aucun gain.
 
 **Cause :** les données générées couvrent environ 24 jours. Demander
-« les 30 derniers jours » sélectionne donc **toute** la table. Dans ce cas
-un parcours complet est le bon plan, et aucun index ne peut faire mieux —
+" les 30 derniers jours " sélectionne donc **toute** la table. Dans ce cas
+un parcours complet est le bon plan, et aucun index ne peut faire mieux -
 PostgreSQL avait raison, c'est la requête qui était mal choisie.
 
 **Correction :** fenêtre ramenée à 2 jours (~8 % des lignes).
 
-**Ce que ça apprend :** un index ne « rend pas rapide ». Il sert à éviter de
+**Ce que ça apprend :** un index ne " rend pas rapide ". Il sert à éviter de
 lire ce dont on n'a pas besoin. Si on a besoin de tout, il ne sert à rien.
 
 ## 5. L'index BRIN était inutile
@@ -91,7 +91,7 @@ quand on la lançait à la main.
 
 **Cause :** le script était lancé par SSH avec un pseudo-terminal (`ssh -tt`,
 nécessaire pour `sudo`). Quand `psql` écrit vers un terminal, il envoie sa
-sortie dans un pagineur (`less`) — qui attend une touche que personne ne
+sortie dans un pagineur (`less`) - qui attend une touche que personne ne
 tapera jamais. Le test manuel passait justement parce qu'il n'avait pas de
 terminal.
 
@@ -108,7 +108,7 @@ Deux fois le même piège :
 
 - `sudo -S chpasswd <<< 'user:motdepasse'` : le `<<<` remplace l'entrée
   standard de **sudo**, qui lit donc `user:motdepasse` comme mot de passe.
-  Solution : `printf 'motdepasse\nuser:nouveau\n' | sudo -S chpasswd` —
+  Solution : `printf 'motdepasse\nuser:nouveau\n' | sudo -S chpasswd` -
   sudo consomme la première ligne, `chpasswd` lit le reste.
 - `sudo -u autre ...` imbriqué dans un script déjà lancé par `sudo -S` :
   l'entrée standard est déjà consommée, le sudo interne attend pour rien.
@@ -129,7 +129,7 @@ quatre mots diffèrent au lieu de le supposer.
 
 `run_all.sh` détruit et recrée la base. Les bonus (colonne chiffrée, table
 d'anomalies, fonctions de démonstration) disparaissaient donc à chaque
-reconstruction, sans que rien ne le signale — on ne s'en apercevait qu'en
+reconstruction, sans que rien ne le signale - on ne s'en apercevait qu'en
 cherchant une colonne devenue absente.
 
 D'où `run_bonus.sh`, séparé, avec l'ordre écrit noir sur blanc : `run_all.sh`

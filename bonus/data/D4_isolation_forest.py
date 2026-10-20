@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-BONUS D4 — Trouver les comptes les plus différents des autres.
+BONUS D4 - Trouver les comptes les plus différents des autres.
 
 Le sujet renvoie à "un script fourni dans le guide". Ce guide ne m'ayant
 pas été transmis, voici ma propre version.
@@ -45,11 +45,11 @@ if not fichiers:
 
 entree = fichiers[-1]
 df = pd.read_csv(entree)
-print(f"Lu : {os.path.basename(entree)} — {len(df)} comptes\n")
+print(f"Lu : {os.path.basename(entree)} - {len(df)} comptes\n")
 
 # --- 2. Choisir les colonnes qui décrivent le comportement -------------
 COLONNES = ["balance", "nb_ecritures", "retrait_moyen", "retrait_max",
-            "retrait_ecart_type", "nb_retraits", "nb_depots"]
+           "retrait_ecart_type", "nb_retraits", "nb_depots"]
 
 manquantes = [c for c in COLONNES if c not in df.columns]
 if manquantes:
@@ -92,7 +92,7 @@ print(affichage.to_string(index=False))
 print("\nPour comparaison, un compte parfaitement banal :")
 banal = df[df["anomalie"] == 1].sort_values("score", ascending=False).head(1)
 print(banal[["account_id", "score", "balance", "nb_retraits",
-             "retrait_moyen", "retrait_max"]].round(2).to_string(index=False))
+            "retrait_moyen", "retrait_max"]].round(2).to_string(index=False))
 
 # --- 5. Écrire le résultat ---------------------------------------------
 sortie = os.path.join(DOSSIER, "comptes-atypiques.csv")
@@ -107,10 +107,10 @@ if zfichiers:
     comptes_if = set(atypiques["account_id"])
     communs = comptes_z & comptes_if
     print(f"\nRecoupement avec le score z (D2) :")
-    print(f"  comptes signalés par le score z        : {len(comptes_z)}")
-    print(f"  comptes signalés par Isolation Forest  : {len(comptes_if)}")
-    print(f"  signalés par les deux méthodes         : {len(communs)}")
+    print(f" comptes signalés par le score z        : {len(comptes_z)}")
+    print(f" comptes signalés par Isolation Forest  : {len(comptes_if)}")
+    print(f" signalés par les deux méthodes         : {len(communs)}")
     print("\n  Les deux méthodes ne voient pas la même chose, et c'est normal :")
-    print("  le score z repère un MONTANT hors norme, Isolation Forest repère")
-    print("  un COMPORTEMENT de compte hors norme. Un compte peut n'avoir que")
-    print("  des montants ordinaires tout en se comportant bizarrement.")
+    print(" le score z repère un MONTANT hors norme, Isolation Forest repère")
+    print(" un COMPORTEMENT de compte hors norme. Un compte peut n'avoir que")
+    print(" des montants ordinaires tout en se comportant bizarrement.")

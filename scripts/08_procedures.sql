@@ -1,5 +1,5 @@
 -- =====================================================================
--- NovaBank Core — Étape 7 : les procédures
+-- NovaBank Core - Étape 7 : les procédures
 --   sp_transfer         : le virement sûr
 --   sp_open_account     : l'ouverture d'un compte
 --   fn_account_statement: le relevé

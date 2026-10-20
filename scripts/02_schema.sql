@@ -1,5 +1,5 @@
 -- =====================================================================
--- NovaBank Core — Étape 2a : la base et les 6 tables
+-- NovaBank Core - Étape 2a : la base et les 6 tables
 -- Les colonnes sont imposées par le sujet ; les types et les
 -- protections (CHECK, UNIQUE, clés étrangères) sont nos choix.
 -- =====================================================================
@@ -15,7 +15,7 @@ COMMENT ON SCHEMA core  IS 'Données métier de NovaBank';
 COMMENT ON SCHEMA audit IS 'Journal des modifications sensibles';
 
 -- ---------------------------------------------------------------------
--- 1. core.customers — les clients
+-- 1. core.customers - les clients
 --    Garanties demandées : email unique et valide, client majeur.
 -- ---------------------------------------------------------------------
 CREATE TABLE core.customers (
@@ -44,7 +44,7 @@ CREATE TABLE core.customers (
 );
 
 -- ---------------------------------------------------------------------
--- 2. core.accounts — les comptes
+-- 2. core.accounts - les comptes
 --    Garanties demandées : solde jamais négatif, IBAN unique.
 --    Un client a plusieurs comptes : la clé étrangère va vers customers.
 -- ---------------------------------------------------------------------
@@ -67,7 +67,7 @@ CREATE TABLE core.accounts (
 );
 
 -- ---------------------------------------------------------------------
--- 3. core.transfers — les virements (l'intention)
+-- 3. core.transfers - les virements (l'intention)
 --    Garanties demandées : montant positif, comptes différents.
 -- ---------------------------------------------------------------------
 CREATE TABLE core.transfers (
@@ -83,7 +83,7 @@ CREATE TABLE core.transfers (
 );
 
 -- ---------------------------------------------------------------------
--- 4. core.transactions — les écritures (le grand livre)
+-- 4. core.transactions - les écritures (le grand livre)
 --    Garanties demandées : jamais modifiée ni supprimée (étape 6),
 --    un virement = 2 écritures ou aucune (étape 7).
 -- ---------------------------------------------------------------------
@@ -107,7 +107,7 @@ CREATE TABLE core.transactions (
 );
 
 -- ---------------------------------------------------------------------
--- 5. core.fraud_alerts — les alertes
+-- 5. core.fraud_alerts - les alertes
 --    Remplie automatiquement par un trigger (étape 6).
 -- ---------------------------------------------------------------------
 CREATE TABLE core.fraud_alerts (
@@ -123,7 +123,7 @@ CREATE TABLE core.fraud_alerts (
 );
 
 -- ---------------------------------------------------------------------
--- 6. audit.audit_log — le journal
+-- 6. audit.audit_log - le journal
 --    Qui, quand, avant, après. Rempli par trigger (étape 6).
 -- ---------------------------------------------------------------------
 CREATE TABLE audit.audit_log (

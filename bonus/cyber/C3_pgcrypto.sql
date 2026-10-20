@@ -1,5 +1,5 @@
 -- =====================================================================
--- BONUS C3 — Cacher une donnée
+-- BONUS C3 - Cacher une donnée
 -- Le numéro de téléphone est stocké chiffré. Illisible dans la table,
 -- lisible seulement avec la clé.
 --
@@ -34,7 +34,7 @@ WHERE phone IS NOT NULL;
 \echo '--- 3. Ce que voit quelqu''un qui lit la table (illisible) ---'
 SELECT customer_id,
        phone                                    AS en_clair,
-       left(encode(phone_enc, 'hex'), 48) || '…' AS stocke
+       left(encode(phone_enc, 'hex'), 48) || '...' AS stocke
 FROM core.customers WHERE phone_enc IS NOT NULL ORDER BY customer_id LIMIT 3;
 
 \echo ''

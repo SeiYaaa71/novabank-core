@@ -1,6 +1,6 @@
 
 ==============================================================
- C3 — cacher un numéro de téléphone (pgcrypto)
+ C3 - cacher un numéro de téléphone (pgcrypto)
 ==============================================================
 
 --- 1. Avant : le téléphone est en clair dans la table ---
@@ -17,9 +17,9 @@
 --- 3. Ce que voit quelqu'un qui lit la table (illisible) ---
  customer_id | en_clair |                      stocke                       
 -------------+----------+---------------------------------------------------
-           1 |          | c30d040703020ef3b3e4d3084eed64d23d017bef4e13c41e…
-           2 |          | c30d04070302b4b70882929af84b61d23d01401f66393fb8…
-           3 |          | c30d0407030293cc7edaed2210347fd23d01bc0109676f13…
+           1 |          | c30d040703020ef3b3e4d3084eed64d23d017bef4e13c41e...
+           2 |          | c30d04070302b4b70882929af84b61d23d01401f66393fb8...
+           3 |          | c30d0407030293cc7edaed2210347fd23d01bc0109676f13...
 (3 rows)
 
 
@@ -44,7 +44,7 @@ psql:bonus/cyber/C3_pgcrypto.sql:55: NOTICE:  Refusé, comme attendu : Wrong key
 
 
 ==============================================================
- C4 — injection SQL, puis correction
+ C4 - injection SQL, puis correction
 ==============================================================
 
 === 1. Usage normal : on cherche un nom précis ===
@@ -92,10 +92,10 @@ psql:bonus/cyber/C3_pgcrypto.sql:55: NOTICE:  Refusé, comme attendu : Wrong key
 >>> C4 terminé.
     À retenir : échapper les quotes à la main ne suffit pas. La seule
     méthode sûre est de ne jamais mettre la valeur dans le texte de
-    la requête — USING la transmet à part.
+    la requête - USING la transmet à part.
 
 ==============================================================
- D1 — cinq analyses (rank, lag, ntile)
+ D1 - cinq analyses (rank, lag, ntile)
 ==============================================================
 
 === 1. Qui a le plus d'argent, par tranche d'âge ? ===
@@ -176,7 +176,7 @@ psql:bonus/cyber/C3_pgcrypto.sql:55: NOTICE:  Refusé, comme attendu : Wrong key
 >>> D1 terminé.
 
 ==============================================================
- D2 — retraits anormaux (score z)
+ D2 - retraits anormaux (score z)
 ==============================================================
 
 --- Combien de retraits anormaux sur le million d'écritures ? ---
@@ -216,9 +216,9 @@ psql:bonus/cyber/C3_pgcrypto.sql:55: NOTICE:  Refusé, comme attendu : Wrong key
 >>> D2 terminé.
 
 ==============================================================
- D3 — rapport automatique en CSV
+ D3 - rapport automatique en CSV
 ==============================================================
-Rapports NovaBank — 20/10/2026 13:34
+Rapports NovaBank - 20/10/2026 13:34
 
 COPY 1002
   soldes-par-compte-20261020.csv   1002 lignes
@@ -246,9 +246,9 @@ account_id,account_type,status,balance,customer_id,kyc_status,risk_level
 958,epargne,active,1091435.87,458,verified,3
 
 ==============================================================
- D4 — comptes atypiques (Isolation Forest)
+ D4 - comptes atypiques (Isolation Forest)
 ==============================================================
-Lu : comptes-pour-analyse-20261020.csv — 1002 comptes
+Lu : comptes-pour-analyse-20261020.csv - 1002 comptes
 
 Comptes jugés atypiques : 21 sur 1002 (2.1 %)
 

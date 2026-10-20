@@ -1,20 +1,20 @@
 # NovaBank Core
 
 Base de données d'une banque en ligne, sur PostgreSQL 18.
-Module SQL avancé & administration PostgreSQL — Bachelor 2.
+Module SQL avancé & administration PostgreSQL - Bachelor 2.
 
 ---
 
 ## Le problème qu'on résout
 
 Le prototype de NovaBank avait trois défauts. La base livrée ici les rend
-impossibles — non pas par consigne, mais parce que le serveur refuse.
+impossibles - non pas par consigne, mais parce que le serveur refuse.
 
 | Le défaut du prototype | La réponse, et où elle est |
 |---|---|
-| Un employé a exporté tous les emails : il avait trop de droits. | `GRANT SELECT (colonne)` : l'analyste n'a pas le droit de lire `customers.email`. Le support ne voit qu'une vue masquée. → `04_roles.sql`, `05_views.sql` |
-| Deux virements en même temps ont donné un solde négatif. | `SELECT ... FOR UPDATE` dans le trigger de solde : le deuxième virement attend le premier. Plus la contrainte `balance >= 0`. → `07_triggers.sql` |
-| L'historique d'un compte mettait plus de 4 secondes. | Index `(account_id, created_at DESC)` : filtre et tri dans la même structure. **16,06 ms → 0,056 ms** sur 1 000 000 d'écritures. → `06_indexes.sql` |
+| Un employé a exporté tous les emails : il avait trop de droits. | `GRANT SELECT (colonne)` : l'analyste n'a pas le droit de lire `customers.email`. Le support ne voit qu'une vue masquée. -> `04_roles.sql`, `05_views.sql` |
+| Deux virements en même temps ont donné un solde négatif. | `SELECT ... FOR UPDATE` dans le trigger de solde : le deuxième virement attend le premier. Plus la contrainte `balance >= 0`. -> `07_triggers.sql` |
+| L'historique d'un compte mettait plus de 4 secondes. | Index `(account_id, created_at DESC)` : filtre et tri dans la même structure. **16,06 ms -> 0,056 ms** sur 1 000 000 d'écritures. -> `06_indexes.sql` |
 
 ---
 
@@ -41,25 +41,25 @@ d'écritures, exécute les 32 tests et produit une sauvegarde.
 
 | Fichier | Étape du sujet | Ce qu'il fait |
 |---|---|---|
-| `scripts/01_server_setup.sh` | 1 — Le serveur | Installe PostgreSQL. `listen_addresses = localhost`, `pg_hba.conf` réécrit, `ufw`活 : SSH ouvert, port 5432 fermé de l'extérieur. |
-| `scripts/02_schema.sql` | 2 — Les tables | Schémas `core` et `audit`, les 6 tables, leurs contraintes. |
-| `scripts/03_seed.sql` | 2 — Les données | 500 clients, 1 000 comptes, **1 000 000 d'écritures** via `generate_series`. |
-| `scripts/04_roles.sql` | 3 — Les droits | Les 4 profils, au minimum de droits. |
+| `scripts/01_server_setup.sh` | 1 - Le serveur | Installe PostgreSQL. `listen_addresses = localhost`, `pg_hba.conf` réécrit, `ufw` : SSH ouvert, port 5432 fermé de l'extérieur. |
+| `scripts/02_schema.sql` | 2 - Les tables | Schémas `core` et `audit`, les 6 tables, leurs contraintes. |
+| `scripts/03_seed.sql` | 2 - Les données | 500 clients, 1 000 comptes, **1 000 000 d'écritures** via `generate_series`. |
+| `scripts/04_roles.sql` | 3 - Les droits | Les 4 profils, au minimum de droits. |
 | `scripts/04b_set_passwords.sh` | 3 | Tire les mots de passe au hasard, hors du dépôt. |
-| `scripts/05_views.sql` | 4 — Les vues | Vue masquée, vue modifiable avec `CHECK OPTION`, vue matérialisée. |
-| `scripts/06_indexes.sql` | 5 — Les index | 4 index + 1 partiel, avec `EXPLAIN ANALYZE` avant et après. |
-| `scripts/07_triggers.sql` | 6 — Les triggers | Solde automatique, grand livre figé, fraude, audit. |
-| `scripts/08_procedures.sql` | 7 — Les procédures | `sp_transfer`, `sp_open_account`, `fn_account_statement`. |
-| `scripts/09_tests.sql` | 8 — Les tests | 32 tests : ce qui doit marcher, et ce qui doit être refusé. |
-| `scripts/10_backup.sh` | 8 — La sauvegarde | `pg_dump` en deux formats + empreintes SHA-256. |
-| `run_all.sh` | — | Rejoue tout, de zéro. |
+| `scripts/05_views.sql` | 4 - Les vues | Vue masquée, vue modifiable avec `CHECK OPTION`, vue matérialisée. |
+| `scripts/06_indexes.sql` | 5 - Les index | 4 index + 1 partiel, avec `EXPLAIN ANALYZE` avant et après. |
+| `scripts/07_triggers.sql` | 6 - Les triggers | Solde automatique, grand livre figé, fraude, audit. |
+| `scripts/08_procedures.sql` | 7 - Les procédures | `sp_transfer`, `sp_open_account`, `fn_account_statement`. |
+| `scripts/09_tests.sql` | 8 - Les tests | 32 tests : ce qui doit marcher, et ce qui doit être refusé. |
+| `scripts/10_backup.sh` | 8 - La sauvegarde | `pg_dump` en deux formats + empreintes SHA-256. |
+| `run_all.sh` | - | Rejoue tout, de zéro. |
 
-### Pourquoi l'ordre d'exécution n'est pas 1-2-3-4…
+### Pourquoi l'ordre d'exécution n'est pas 1-2-3-4...
 
 `run_all.sh` exécute les droits (étape 3) en avant-dernier. Les `GRANT`
 portent sur des vues (étape 4) et des procédures (étape 7) : ces objets
 doivent exister avant qu'on puisse donner des droits dessus. L'ordre réel
-est 2 → 4 → 5 → 6 → 7 → **3** → 8.
+est 2 -> 4 -> 5 -> 6 -> 7 -> **3** -> 8.
 
 ---
 
@@ -68,11 +68,11 @@ est 2 → 4 → 5 → 6 → 7 → **3** → 8.
 Un client a plusieurs comptes. Un virement produit deux écritures.
 
 ```
-customers ──< accounts ──< transactions >── transfers
-                  │              │
-                  └──< fraud_alerts ──┘
+customers --< accounts --< transactions >-- transfers
+                  |              |
+                  +--< fraud_alerts --+
 
-audit.audit_log  ← alimenté par trigger depuis customers, accounts, fraud_alerts
+audit.audit_log  <- alimenté par trigger depuis customers, accounts, fraud_alerts
 ```
 
 **Choix de types qui comptent :**
@@ -99,7 +99,7 @@ audit.audit_log  ← alimenté par trigger depuis customers, accounts, fraud_ale
 | Montant positif, comptes différents | `CHECK` sur `transfers` |
 | Grand livre jamais modifié ni supprimé | Triggers `BEFORE UPDATE`, `BEFORE DELETE`, `BEFORE TRUNCATE` qui lèvent une erreur |
 | Un virement = 2 écritures ou aucune | `sp_transfer`, sans bloc `EXCEPTION` : toute erreur annule les 3 lignes |
-| Alerte si retrait ≥ 5 000 | Trigger `AFTER INSERT` sur `transactions` |
+| Alerte si retrait >= 5 000 | Trigger `AFTER INSERT` sur `transactions` |
 | Alerte si 5 virements en 10 min | Trigger `AFTER INSERT` sur `transfers` |
 | Tout changement noté : qui, quand, avant, après | Trigger générique `audit.fn_log_change()` avec `to_jsonb(OLD)` / `to_jsonb(NEW)` |
 
@@ -141,22 +141,22 @@ l'atomicité du virement, les deux règles de fraude, l'audit, les vues et
 les droits de chaque rôle.
 
 Le test le plus parlant : on lance un virement sans provision, puis on
-vérifie qu'il n'a **rien** laissé derrière lui — ni ligne dans `transfers`,
+vérifie qu'il n'a **rien** laissé derrière lui - ni ligne dans `transfers`,
 ni écriture. En entier, ou pas du tout.
 
 ### Mesures d'index (dernière exécution, 1 000 000 d'écritures)
 
 | Requête | Avant index | Après index | Plan d'exécution |
 |---|---|---|---|
-| 50 dernières écritures du compte 42 | 16,06 ms | **0,056 ms** | `Parallel Seq Scan` → `Index Scan` |
-| Retraits des 2 derniers jours | 25,83 ms | **6,54 ms** | `Parallel Seq Scan` → `Bitmap Index Scan` (BRIN) |
+| 50 dernières écritures du compte 42 | 16,06 ms | **0,056 ms** | `Parallel Seq Scan` -> `Index Scan` |
+| Retraits des 2 derniers jours | 25,83 ms | **6,54 ms** | `Parallel Seq Scan` -> `Bitmap Index Scan` (BRIN) |
 
-La première requête est celle du sujet (« l'historique met plus de
-4 secondes »). Elle lisait 9 865 blocs ; elle en lit maintenant 8.
+La première requête est celle du sujet (" l'historique met plus de
+4 secondes "). Elle lisait 9 865 blocs ; elle en lit maintenant 8.
 
 ---
 
-## Les bonus — les deux parcours
+## Les bonus - les deux parcours
 
 ```bash
 ./run_bonus.sh                  # tout ce qui touche la base
@@ -183,13 +183,13 @@ fonctions de démonstration.
 | D1 | Analyser | `bonus/data/D1_analyses.sql` | 5 requêtes : podium des avoirs par tranche d'âge (`rank`), tendance des dépôts jour après jour (`lag`), déciles de richesse (`ntile`), top des retraits, solde recalculé en somme glissante. |
 | D2 | Retraits bizarres | `bonus/data/D2_zscore.sql` | Score z par rapport à la moyenne **de chaque compte**. 4 000 retraits au-delà de 3 écarts-types, rangés dans `core.anomalies_retraits`. Score maximum : 17,3. |
 | D3 | Rapport automatique | `bonus/data/D3_rapport_csv.sh` | 5 fichiers CSV ouvrables dans Excel, produits par `\copy`. |
-| D4 | Comptes bizarres | `bonus/data/D4_isolation_forest.py` | Isolation Forest sur 7 caractéristiques par compte. 21 comptes atypiques sur 1 002 — dont, sans qu'on le lui dise, les deux comptes de test à l'historique minuscule. |
+| D4 | Comptes bizarres | `bonus/data/D4_isolation_forest.py` | Isolation Forest sur 7 caractéristiques par compte. 21 comptes atypiques sur 1 002 - dont, sans qu'on le lui dise, les deux comptes de test à l'historique minuscule. |
 
 **Pourquoi D2 et D4 ne donnent pas la même chose** : le score z regarde un
 *montant* isolé, Isolation Forest regarde le *comportement* d'un compte dans
-son ensemble (solde, nombre d'opérations, retrait moyen, retrait maximum…).
+son ensemble (solde, nombre d'opérations, retrait moyen, retrait maximum...).
 Un compte peut n'avoir que des montants ordinaires et se comporter
-bizarrement — et inversement.
+bizarrement - et inversement.
 
 ---
 
@@ -200,7 +200,7 @@ Claude (Anthropic)**, utilisé pour la rédaction des scripts SQL et Bash, le
 choix des mécanismes PostgreSQL et la rédaction de ce README.
 
 Chaque ligne a été exécutée et vérifiée sur la VM. Les points où l'IA s'est
-trompée et a dû corriger sont consignés dans `NOTES.md` — ils font partie du
+trompée et a dû corriger sont consignés dans `NOTES.md` - ils font partie du
 travail, pas d'un vernis.
 
 ---

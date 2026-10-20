@@ -1,4 +1,4 @@
- AVANT INDEX — historique des 50 dernières écritures du compte 42
+ AVANT INDEX - historique des 50 dernières écritures du compte 42
 ============================================================
                                              QUERY PLAN                                              
 -----------------------------------------------------------------------------------------------------
@@ -25,7 +25,7 @@
 (20 rows)
 
 
---- AVANT INDEX — total des retraits des 2 derniers jours ---
+--- AVANT INDEX - total des retraits des 2 derniers jours ---
                                                   QUERY PLAN                                                   
 ---------------------------------------------------------------------------------------------------------------
  Finalize Aggregate (actual time=23.726..25.389 rows=1.00 loops=1)
@@ -48,7 +48,7 @@
 
 
 ============================================================
- APRÈS INDEX — exactement la même requête
+ APRÈS INDEX - exactement la même requête
 ============================================================
                                                  QUERY PLAN                                                  
 -------------------------------------------------------------------------------------------------------------
@@ -65,7 +65,7 @@
 (10 rows)
 
 
---- APRÈS INDEX — total des retraits des 2 derniers jours ---
+--- APRÈS INDEX - total des retraits des 2 derniers jours ---
                                               QUERY PLAN                                              
 ------------------------------------------------------------------------------------------------------
  Aggregate (actual time=11.321..11.322 rows=1.00 loops=1)

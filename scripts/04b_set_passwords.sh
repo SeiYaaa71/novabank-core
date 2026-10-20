@@ -18,6 +18,6 @@ for role in novabank_analyst novabank_support novabank_app novabank_auditor; do
     mv "${PGPASS}.tmp" "$PGPASS" 2>/dev/null || true
     echo "127.0.0.1:5432:novabank:${role}:${pw}" >> "$PGPASS"
     chmod 600 "$PGPASS"
-    echo "  mot de passe posé : ${role}"
+    echo " mot de passe posé : ${role}"
 done
 echo "Secrets dans ${SECRETS_DIR}/roles.env (chmod 600, hors dépôt)."

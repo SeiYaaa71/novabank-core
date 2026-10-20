@@ -1,5 +1,5 @@
 -- =====================================================================
--- NovaBank Core — Étape 8 : les tests
+-- NovaBank Core - Étape 8 : les tests
 -- On prouve deux choses : ce qui doit marcher marche, et ce qui doit
 -- être refusé est refusé. Chaque test affiche OK ou ECHEC.
 -- À exécuter en DERNIER (après les droits).

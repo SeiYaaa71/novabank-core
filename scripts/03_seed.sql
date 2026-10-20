@@ -1,5 +1,5 @@
 -- =====================================================================
--- NovaBank Core — Étape 2b : fabriquer les données (1 000 000 d'écritures)
+-- NovaBank Core - Étape 2b : fabriquer les données (1 000 000 d'écritures)
 -- 500 clients -> 1 000 comptes -> 1 000 écritures par compte.
 -- Exécuté AVANT les triggers (étape 6) : ici on écrit le passé tel quel,
 -- les triggers n'ont pas à le recalculer.

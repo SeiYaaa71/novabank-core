@@ -1,5 +1,5 @@
 -- =====================================================================
--- NovaBank Core — Étape 6 : les triggers
+-- NovaBank Core - Étape 6 : les triggers
 --   a) le solde se met à jour seul
 --   b) le passé ne change plus (grand livre en écriture seule)
 --   c) les fraudes sont notées
@@ -170,7 +170,7 @@ CREATE TRIGGER trg_detect_rapid_transfers
     FOR EACH ROW EXECUTE FUNCTION core.fn_detect_rapid_transfers();
 
 -- =====================================================================
--- d) LES CHANGEMENTS SONT NOTÉS — qui, quand, avant, après
+-- d) LES CHANGEMENTS SONT NOTÉS - qui, quand, avant, après
 --    Une seule fonction générique, branchée sur plusieurs tables.
 --    to_jsonb(ligne) transforme la ligne entière en JSON : le journal
 --    reste valable même si on ajoute une colonne plus tard.

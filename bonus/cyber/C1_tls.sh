@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =====================================================================
-# BONUS C1 — Chiffrer les connexions à la base
+# BONUS C1 - Chiffrer les connexions à la base
 # L'équivalent du cadenas d'un site web : entre le client et le serveur,
 # tout passe chiffré. Sans cela, un mot de passe ou un relevé circule en
 # clair sur le réseau.
@@ -28,9 +28,9 @@ chown postgres:postgres "${CERT_DIR}/server.key" "${CERT_DIR}/server.crt"
 openssl x509 -in "${CERT_DIR}/server.crt" -noout -subject -dates
 
 echo "[2/4] Activation de TLS dans postgresql.conf"
-sed -i "s|^#\?ssl *=.*|ssl = on|"                                   "$PG_CONF"
+sed -i "s|^#\?ssl *=.*|ssl = on|"                                 "$PG_CONF"
 sed -i "s|^#\?ssl_cert_file *=.*|ssl_cert_file = '${CERT_DIR}/server.crt'|" "$PG_CONF"
-sed -i "s|^#\?ssl_key_file *=.*|ssl_key_file = '${CERT_DIR}/server.key'|"   "$PG_CONF"
+sed -i "s|^#\?ssl_key_file *=.*|ssl_key_file = '${CERT_DIR}/server.key'|" "$PG_CONF"
 grep -E "^ssl" "$PG_CONF"
 
 echo "[3/4] pg_hba.conf : TLS OBLIGATOIRE en TCP"
@@ -59,29 +59,29 @@ export PAGER=cat
 export PSQL_PAGER=cat
 CHAINE="host=127.0.0.1 dbname=novabank user=novabank_analyst"
 
-echo "  a) Connexion TCP chiffrée — ce que voit le serveur :"
+echo " a) Connexion TCP chiffrée - ce que voit le serveur :"
 timeout 15 psql -P pager=off -w "${CHAINE} sslmode=require" -tAc \
-  "SELECT 'TLS actif=' || ssl || '  protocole=' || version || '  chiffrement=' || cipher
+ "SELECT 'TLS actif=' || ssl || '  protocole=' || version || '  chiffrement=' || cipher
    FROM pg_stat_ssl WHERE pid = pg_backend_pid();" \
-  || echo "     (échec — scripts/04b_set_passwords.sh a-t-il été lancé ?)"
+  || echo "    (échec - scripts/04b_set_passwords.sh a-t-il été lancé ?)"
 
 echo
-echo "  b) La même connexion en REFUSANT le chiffrement :"
+echo " b) La même connexion en REFUSANT le chiffrement :"
 SORTIE="$(timeout 15 psql -P pager=off -w "${CHAINE} sslmode=disable" -tAc "SELECT 1" 2>&1 || true)"
 if printf '%s' "$SORTIE" | grep -qiE "no pg_hba.conf entry|no encryption|SSL (connection )?required"; then
-    echo "     REFUSÉE — plus aucune ligne de pg_hba.conf n'autorise le TCP en clair."
+    echo "    REFUSÉE - plus aucune ligne de pg_hba.conf n'autorise le TCP en clair."
     printf '     message du serveur : %s\n' "$(printf '%s' "$SORTIE" | head -1)"
 else
-    echo "     ATTENTION : la connexion en clair passe encore."
+    echo "    ATTENTION : la connexion en clair passe encore."
     printf '%s\n' "$SORTIE" | head -2
 fi
 
 echo
-echo "  c) La socket locale, elle, n'a pas besoin de TLS :"
-echo "     (rien ne circule sur le réseau, le chiffrement n'aurait pas d'objet)"
+echo " c) La socket locale, elle, n'a pas besoin de TLS :"
+echo "    (rien ne circule sur le réseau, le chiffrement n'aurait pas d'objet)"
 timeout 15 psql -P pager=off -w -d novabank -tAc \
-  "SELECT 'connexion locale ok, ssl=' || coalesce((SELECT ssl::text FROM pg_stat_ssl WHERE pid=pg_backend_pid()),'f');" \
-  2>/dev/null || echo "     (la socket locale utilise peer : lancez cette ligne sous votre compte)"
+ "SELECT 'connexion locale ok, ssl=' || coalesce((SELECT ssl::text FROM pg_stat_ssl WHERE pid=pg_backend_pid()),'f');" \
+  2>/dev/null || echo "    (la socket locale utilise peer : lancez cette ligne sous votre compte)"
 
 echo
-echo "OK — C1 terminé."
+echo "OK - C1 terminé."

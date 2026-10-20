@@ -1,5 +1,5 @@
 -- =====================================================================
--- BONUS C4 — Attaquer sa propre base, puis la réparer
+-- BONUS C4 - Attaquer sa propre base, puis la réparer
 -- On écrit volontairement une fonction vulnérable, on l'exploite,
 -- puis on la corrige avec format() et USING.
 -- =====================================================================
@@ -69,4 +69,4 @@ SELECT count(*) AS lignes_rendues FROM core.fn_chercher_client_sur('Nom1');
 \echo '>>> C4 terminé.'
 \echo '    À retenir : échapper les quotes à la main ne suffit pas. La seule'
 \echo '    méthode sûre est de ne jamais mettre la valeur dans le texte de'
-\echo '    la requête — USING la transmet à part.'
+\echo '    la requête - USING la transmet à part.'

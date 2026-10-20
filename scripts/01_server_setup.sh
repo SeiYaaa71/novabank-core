@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # =====================================================================
-# NovaBank Core — Étape 1 : installer PostgreSQL et limiter l'accès
+# NovaBank Core - Étape 1 : installer PostgreSQL et limiter l'accès
 # Idempotent : relançable sans casse.
 # =====================================================================
 set -euo pipefail
@@ -13,14 +13,14 @@ sudo apt-get install -y -qq postgresql postgresql-contrib ufw
 PG_VERSION="$(psql --version | awk '{print $3}' | cut -d. -f1)"
 PG_CONF="/etc/postgresql/${PG_VERSION}/main/postgresql.conf"
 PG_HBA="/etc/postgresql/${PG_VERSION}/main/pg_hba.conf"
-echo "      PostgreSQL ${PG_VERSION} détecté"
+echo "     PostgreSQL ${PG_VERSION} détecté"
 
 echo "[2/5] Le serveur n'écoute que la machine elle-même"
 # Aucune connexion depuis le réseau : la base n'est joignable qu'en local.
 sudo sed -i "s/^#\?listen_addresses.*/listen_addresses = 'localhost'/" "$PG_CONF"
 # Journalisation utile pour l'audit et le bonus C2.
-sudo sed -i "s/^#\?log_connections.*/log_connections = 'all'/"        "$PG_CONF"
-sudo sed -i "s/^#\?log_disconnections.*/log_disconnections = on/"     "$PG_CONF"
+sudo sed -i "s/^#\?log_connections.*/log_connections = 'all'/"      "$PG_CONF"
+sudo sed -i "s/^#\?log_disconnections.*/log_disconnections = on/"   "$PG_CONF"
 sudo sed -i "s/^#\?log_line_prefix.*/log_line_prefix = '%m [%p] %q%u@%d %h '/" "$PG_CONF"
 
 echo "[3/5] Authentification : mot de passe chiffré obligatoire"
@@ -46,4 +46,4 @@ echo "[5/5] Redémarrage"
 sudo systemctl restart postgresql
 sudo systemctl is-active postgresql
 
-echo "OK — serveur prêt et restreint au local."
+echo "OK - serveur prêt et restreint au local."

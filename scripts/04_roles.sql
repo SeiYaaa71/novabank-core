@@ -1,5 +1,5 @@
 -- =====================================================================
--- NovaBank Core — Étape 3 : les 4 profils, au minimum de droits
+-- NovaBank Core - Étape 3 : les 4 profils, au minimum de droits
 --
 -- Rappel du problème n°1 du sujet : "un employé a exporté tous les emails,
 -- il avait trop de droits". La réponse est ici, ligne par ligne :
