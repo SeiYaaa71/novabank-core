@@ -193,15 +193,11 @@ bizarrement - et inversement.
 
 ---
 
-## Déclaration d'usage de l'IA
+## Usage de l'IA
 
-Conformément aux règles du sujet : **ce projet a été réalisé avec l'aide de
-Claude (Anthropic)**, utilisé pour la rédaction des scripts SQL et Bash, le
-choix des mécanismes PostgreSQL et la rédaction de ce README.
-
-Chaque ligne a été exécutée et vérifiée sur la VM. Les points où l'IA s'est
-trompée et a dû corriger sont consignés dans `NOTES.md` - ils font partie du
-travail, pas d'un vernis.
+Ce projet a été réalisé avec l'assistance d'une IA, conformément aux règles
+du sujet qui l'autorisent sous réserve de le déclarer. Tout a été exécuté et
+vérifié sur la VM ; `NOTES.md` recense les erreurs rencontrées et corrigées.
 
 ---
 
